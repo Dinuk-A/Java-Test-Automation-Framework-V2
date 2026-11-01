@@ -5,6 +5,7 @@ import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.options.RequestOptions;
 
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -159,11 +160,12 @@ public class PWAPIUtils {
                         Map<String, String> headers,
                         String jsonBody) {
 
-                headers.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
+                Map<String, String> mutableHeaders = new HashMap<>(headers);
+                mutableHeaders.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
 
                 return apiContext.post(
                                 endpoint,
-                                buildOptions(headers, null, jsonBody));
+                                buildOptions(mutableHeaders, null, jsonBody));
         }
 
         // POST with headers, query parameters, and JSON body
@@ -173,11 +175,12 @@ public class PWAPIUtils {
                         Map<String, String> queryParams,
                         String jsonBody) {
 
-                headers.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
+                Map<String, String> mutableHeaders = new HashMap<>(headers);
+                mutableHeaders.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
 
                 return apiContext.post(
                                 endpoint,
-                                buildOptions(headers, queryParams, jsonBody));
+                                buildOptions(mutableHeaders, queryParams, jsonBody));
         }
 
         // POST with Bearer Token authentication
@@ -245,11 +248,12 @@ public class PWAPIUtils {
                         Map<String, String> headers,
                         String jsonBody) {
 
-                headers.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
+                Map<String, String> mutableHeaders = new HashMap<>(headers);
+                mutableHeaders.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
 
                 return apiContext.put(
                                 endpoint,
-                                buildOptions(headers, null, jsonBody));
+                                buildOptions(mutableHeaders, null, jsonBody));
         }
 
         // PUT with query parameters and JSON body
@@ -303,11 +307,12 @@ public class PWAPIUtils {
                         Map<String, String> headers,
                         String jsonBody) {
 
-                headers.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
+                Map<String, String> mutableHeaders = new HashMap<>(headers);
+                mutableHeaders.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
 
                 return apiContext.patch(
                                 endpoint,
-                                buildOptions(headers, null, jsonBody));
+                                buildOptions(mutableHeaders, null, jsonBody));
         }
 
         // PATCH with Bearer Token authorization and JSON body
@@ -322,6 +327,21 @@ public class PWAPIUtils {
                                                 AUTHORIZATION, BEARER + bearerToken,
                                                 CONTENT_TYPE, APPLICATION_JSON),
                                 jsonBody);
+        }
+
+        // PATCH with headers, query parameters, and JSON body
+        public APIResponse patchWithHeadersAndParams(
+                        String endpoint,
+                        Map<String, String> headers,
+                        Map<String, String> params,
+                        String jsonBody) {
+
+                Map<String, String> mutableHeaders = new HashMap<>(headers);
+                mutableHeaders.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
+
+                return apiContext.patch(
+                                endpoint,
+                                buildOptions(mutableHeaders, params, jsonBody));
         }
 
         // =========================================================
@@ -366,17 +386,37 @@ public class PWAPIUtils {
         }
 
         // DELETE with headers and JSON body
-        public APIResponse deleteWithHeadersAndJson(
+        // legacyy
+        // public APIResponse deleteWithHeadersAndJson(
+        // String endpoint,
+        // Map<String, String> headers,
+        // String jsonBody) {
+
+        // if (headers != null) {
+        // headers.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
+        // }
+
+        // return apiContext.delete(
+        // endpoint,
+        // buildOptions(headers, null, jsonBody));
+        // }
+
+        // DELETE with headers, query parameters, and JSON body
+        public APIResponse deleteWithHeadersParamsAndJson(
                         String endpoint,
                         Map<String, String> headers,
+                        Map<String, String> queryParams,
                         String jsonBody) {
 
+                // copy so callers' (possibly immutable) maps are never mutated
+                Map<String, String> merged = new HashMap<>();
                 if (headers != null) {
-                        headers.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
+                        merged.putAll(headers);
                 }
+                merged.putIfAbsent(CONTENT_TYPE, APPLICATION_JSON);
 
                 return apiContext.delete(
                                 endpoint,
-                                buildOptions(headers, null, jsonBody));
+                                buildOptions(merged, queryParams, jsonBody));
         }
 }
