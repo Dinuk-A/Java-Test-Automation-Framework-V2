@@ -32,4 +32,4 @@
 
 </suite>
 
-<!-- Remove-Item -Recurse -Force .\allure-results; mvn test "-DsuiteXmlFile=src/test/java/dinuka/automation/resources/suites/client_a/sanity_checks.xml" -->
+<!-- Remove-Item -Recurse -Force .\allure-results; mvn test "-DsuiteXmlFile=src/test/resources/suites/client_a/sanity_checks.xml" -->
